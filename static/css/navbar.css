@@ -1,0 +1,8 @@
+#navbarNav ul li a:hover {
+  font-weight: bold;
+}
+
+/* 
+#navbarNav ul li a[aria-current="page"] {
+  color: red !important;
+} */
