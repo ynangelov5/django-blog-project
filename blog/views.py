@@ -1,9 +1,11 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from blog.models import Post
 
 
 def home(request):
-    return render(request, 'blog/home.html')
+    posts = Post.objects.all().order_by('-created_at')
+    return render(request, 'blog/home.html', {'posts': posts})
 
 
 def about(request):
