@@ -17,7 +17,7 @@
   ></script>
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
   {% include "common/navbar.html" %}
 
   <div class="messages container-md">
@@ -30,7 +30,7 @@
     {% endif %}
   </div>
   
-  <div class="container-md">
+  <div class="container-md flex-fill">
     {% block content %}{% endblock %}
   </div>
   
