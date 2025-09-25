@@ -20,7 +20,7 @@
 <body class="d-flex flex-column min-vh-100">
   {% include "common/navbar.html" %}
 
-  <div class="messages container-md">
+  <div class="container-md d-flex justify-content-center pt-3">
     {% if messages %}
       {% for message in messages %}
         <div class="alert alert-{{message.tags}}">

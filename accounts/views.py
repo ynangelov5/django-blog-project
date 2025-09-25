@@ -12,7 +12,7 @@ def register(request):
             username = form.cleaned_data.get('username')
             messages.success(
                 request, 
-                f'Account created successfully. Welcome to the Blog App {username}'
+                f'Account created successfully. Welcome to the Blog App, {username}'
             )
             return redirect('blog-home')
          
