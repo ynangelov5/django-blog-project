@@ -5,11 +5,15 @@
 
 {% block content %}
   <div class="container mt-5">
-    <h2 class="mb-4">Register</h2>
-    <form method="POST" class="form-group">
-      {% csrf_token %}
-      {{ form|crispy }}
-      <button type="submit" class="btn btn-primary">Sign Up</button>
-    </form>
+    <fieldset class="border p-4">
+      <legend class="w-auto">Join Today</legend>
+      <h2 class="mb-4">Register</h2>
+      <form method="POST" class="form-group pb-4">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+        <p class="mt-3">Have an account? <a href="{% url 'login' %}">Log in</a></p>
+      </form>
+    </fieldset>
   </div>
 {% endblock %}
