@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 from accounts.forms import UserRegisterForm
+from accounts.models import Profile
 
 
 def register(request):
@@ -28,7 +30,8 @@ def register(request):
 
 
 @login_required
-def profile(request):
-    return render(request, 'accounts/profile.html')
+def profile_view(request):
+    profile = Profile.objects.get(user=request.user)
+    return render(request, 'accounts/profile.html', {'profile': profile})
     
 

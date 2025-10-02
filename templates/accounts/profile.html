@@ -3,5 +3,23 @@
 {% block title %}Profile{% endblock %}
 
 {% block content %}
-    <h2>{{user.username}}'s profile</h2>
+  <div class="container mt-5">
+    <div class="card mx-auto" style="max-width: 600px;">
+      <div class="row g-0">
+        <div class="col-md-4 text-center p-3">
+          <img src="{{ profile.image.url }}" 
+            class="rounded-circle" 
+            style="width:150px; height:150px; object-fit:cover;" 
+            alt="Profile Picture">
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h4 class="card-title">{{ user.username }}</h4>
+            <p class="card-text">{{ profile.bio|default:"No bio available." }}</p>
+            <a href="#" class="btn btn-primary">Edit Profile</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
