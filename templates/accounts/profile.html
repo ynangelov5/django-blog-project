@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 
 {% block title %}Profile{% endblock %}
 
@@ -16,7 +17,20 @@
           <div class="card-body">
             <h4 class="card-title">{{ user.username }}</h4>
             <p class="card-text">{{ profile.bio|default:"No bio available." }}</p>
-            <a href="#" class="btn btn-primary">Edit Profile</a>
+            
+            <a href="#" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#editProfileForm">
+              Edit Profile
+            </a>
+
+            <div class="collapse mt-3" id="editProfileForm">
+              <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ u_form|crispy }}
+                {{ p_form|crispy }}
+                <button type="submit" class="btn btn-success">Save Changes</button>
+              </form>
+            </div>
+            
           </div>
         </div>
       </div>
