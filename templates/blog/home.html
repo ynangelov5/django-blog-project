@@ -24,7 +24,10 @@
             <h5 class="card-title">{{ post.title }}</h5>
             <p class="card-text">{{ post.content }}</p>
             <div class="d-flex justify-content-between">
-              <small class="text-muted">By {{ post.author.username }}</small>
+              <small class="text-muted d-flex align-items-center">
+                <img src="{{ post.author.profile.image.url }}" alt="Profile image" class="rounded-circle me-2" width="40" height="40">
+                {{ post.author.username }}
+              </small>
               <small class="text-muted">
                 <strong>Created:</strong> {{ post.created_at|date:"M d, Y H:i" }} |
                 <strong>Last edited:</strong> {{ post.updated_at|date:"M d, Y H:i" }}
