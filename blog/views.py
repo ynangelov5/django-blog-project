@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import (
     ListView, DetailView,
     CreateView, UpdateView,
@@ -7,13 +7,8 @@ from django.views.generic import (
 from django.contrib.auth.mixins import (
     LoginRequiredMixin, UserPassesTestMixin
     )
+from django.contrib.auth.models import User
 from blog.models import Post
-
-
-def home(request):
-    posts = Post.objects.all().order_by('-created_at')
-    # user = request.user.profile.image
-    return render(request, 'blog/home.html', {'posts': posts})
 
 
 def about(request):
@@ -25,6 +20,18 @@ class PostListView(ListView):
     template_name = 'blog/home.html'
     context_object_name = 'posts'
     ordering = ['-created_at']
+    paginate_by = 5
+
+
+class UserPostListView(ListView):
+    model = Post
+    template_name = 'blog/user-posts.html'
+    context_object_name = 'posts'
+    paginate_by = 5
+
+    def get_queryset(self):
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        return Post.objects.filter(author=user).order_by('-created_at')
 
 
 class PostDetailView(DetailView):
