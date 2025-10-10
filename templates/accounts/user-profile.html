@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user_obj.username }}'s Profile{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="card mx-auto" style="max-width: 600px;">
+      <div class="row g-0">
+        <div class="col-md-4 text-center p-3">
+          <img src="{{ profile.image.url }}" 
+               class="rounded-circle" 
+               style="width:150px; height:150px; object-fit:cover;" 
+               alt="Profile Picture">
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h4 class="card-title">{{ user_obj.username }}</h4>
+            <p class="card-text">{{ profile.bio|default:"No bio available." }}</p>
+            <a href="{% url 'user-posts' user_obj.username %}" class="btn btn-primary mt-2">
+              View All Posts
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if posts %}
+      <h5 class="mt-4">Recent Posts by {{ user_obj.username }}</h5>
+      {% for post in posts %}
+        <div class="card mb-3 shadow-sm">
+          <div class="card-body">
+            <h6 class="card-title">
+              <a href="{% url 'post-detail' post.id %}" class="text-decoration-none text-dark">
+                {{ post.title }}
+              </a>
+            </h6>
+            <p class="card-text text-truncate">{{ post.content|truncatewords:20 }}</p>
+            <small class="text-muted">Posted on {{ post.created_at|date:"M d, Y" }}</small>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="mt-3">No posts yet.</p>
+    {% endif %}
+  </div>
+{% endblock %}

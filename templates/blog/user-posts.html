@@ -17,7 +17,7 @@
           <p class="card-text">{{ post.content }}</p>
           <div class="d-flex justify-content-between">
             <small class="text-muted d-flex align-items-center">
-              <a href="{% url 'user-posts' post.author.username %}">
+              <a href="{% url 'user-profile' post.author.username %}">
                 <img src="{{ post.author.profile.image.url }}" alt="Profile image" class="rounded-circle me-2" width="40" height="40">
               </a>
               {{ post.author.username }}

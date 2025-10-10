@@ -19,7 +19,7 @@
       <ul class="navbar-nav mb-2 mb-lg-0 ms-auto">
         {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link text-black active" href="{% url "profile" %}">Profile</a>
+            <a class="nav-link text-black active" href="{% url "my-profile" %}">My Profile</a>
           </li>
           <li class="nav-item">
             <form method="POST" action="{% url 'logout' %}"

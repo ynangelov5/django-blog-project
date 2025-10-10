@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.views.generic import DetailView
 from accounts.forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from accounts.models import Profile
 
@@ -29,7 +31,7 @@ def register(request):
 
 
 @login_required
-def profile_view(request):
+def my_profile_view(request):
     profile = request.user.profile
 
     if request.method == 'POST':
@@ -42,7 +44,7 @@ def profile_view(request):
             u_form.save()
             p_form.save()
             messages.success(request, 'Your profile has been updated!')
-            return redirect('profile')
+            return redirect('my-profile')
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=profile)
@@ -54,6 +56,19 @@ def profile_view(request):
         'p_form': p_form
     }
 
-    return render(request, 'accounts/profile.html', context)
+    return render(request, 'accounts/my-profile.html', context)
     
+
+class UserProfileView(DetailView):
+    model = User
+    template_name = 'accounts/user-profile.html'
+    context_object_name = 'user_obj'
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = self.object.profile
+        context['posts'] = self.object.posts.all().order_by('-created_at')[:5]
+        return context
 
