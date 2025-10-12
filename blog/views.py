@@ -8,6 +8,7 @@ from django.contrib.auth.mixins import (
     LoginRequiredMixin, UserPassesTestMixin
     )
 from django.contrib.auth.models import User
+from django.db.models import Q
 from blog.models import Post
 
 
@@ -77,3 +78,40 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return self.request.user == post.author 
         # raises 403 if a user tries to delete someone else's post
 
+
+class PostSearchView(ListView):
+    model = Post
+    template_name = 'blog/search_results.html'
+    context_object_name = 'results'
+    paginate_by = 5
+
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        search_fields = ['query', 'title', 'author'] 
+        q_object = Q()
+
+        for field in search_fields:
+            value = self.request.GET.get(field, '').strip()
+            if value:
+                if field == 'query':
+                    q_object |= Q(title__icontains=value) | Q(author__username__icontains=value)
+                elif field == 'title':
+                    q_object &= Q(title__icontains=value)
+                elif field == 'author':
+                    q_object &= Q(author__username__icontains=value)
+
+        return queryset.filter(q_object)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        title_query = self.request.GET.get('title', '').strip()
+        author_query = self.request.GET.get('author', '').strip()
+        """
+        If the search bar is used, it overrides the title and author filters.  
+        If the search bar is empty but the title and author fields are filled, 
+        their values are combined and shown as the search query.
+        """
+        context['query'] = self.request.GET.get('query', '').strip() or f"{title_query} {author_query}".strip()
+        context['title_query'] = title_query
+        context['author_query'] = author_query
+        return context

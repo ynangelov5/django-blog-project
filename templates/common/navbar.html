@@ -19,11 +19,10 @@
       <ul class="navbar-nav mb-2 mb-lg-0 ms-auto">
         {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link text-black active" href="{% url "my-profile" %}">My Profile</a>
+            <a class="nav-link text-black active" href="{% url 'my-profile' %}">My Profile</a>
           </li>
           <li class="nav-item">
-            <form method="POST" action="{% url 'logout' %}"
-            onsubmit="return confirm('Are you sure you want to log out?');" class="d-inline">
+            <form method="POST" action="{% url 'logout' %}" onsubmit="return confirm('Are you sure you want to log out?');" class="d-inline">
               {% csrf_token %}
               <button type="submit" class="nav-link btn btn-link text-black active">Logout</button>
             </form>
@@ -37,10 +36,44 @@
           </li>
         {% endif %}
       </ul>
-      <form class="d-flex ms-2" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
+      <form class="d-flex position-relative ms-2" role="search" method="get" action="{% url 'search_posts' %}">
+        <div class="dropdown w-100">
+          <input 
+            class="form-control me-2" 
+            type="search" 
+            placeholder="Search" 
+            aria-label="Search" 
+            id="searchInput"
+            name="query"
+            autocomplete="off"
+          >
+          <div class="dropdown-menu w-100 p-3" id="searchDropdown">
+            <div class="mb-2">
+              <label for="titleSearch" class="form-label">Post Title</label>
+              <input type="text" class="form-control" id="titleSearch" name="title">
+            </div>
+            <div>
+              <label for="authorSearch" class="form-label">Author</label>
+              <input type="text" class="form-control" id="authorSearch" name="author">
+            </div>
+            <button type="submit" class="btn btn-success mt-2 w-100">Search</button>
+          </div>
+        </div>
       </form>
+      <script>
+        const searchInput = document.getElementById('searchInput');
+        const dropdown = document.getElementById('searchDropdown');
+
+        searchInput.addEventListener('focus', () => {
+          dropdown.classList.add('show');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('show');
+          }
+        });
+      </script>
     </div>
   </div>
 </nav>
