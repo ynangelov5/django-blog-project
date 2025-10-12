@@ -22,7 +22,12 @@ def register(request):
 
             login(request, user)
 
-            return redirect('blog-home')
+            next_url = request.GET.get('next') or ('blog-home')
+            return redirect(next_url)
+            """
+            Redirects the user to either the home page 
+            or the page they were trying to access without an account
+            """
          
     else:
         form = UserRegisterForm()
