@@ -1,15 +1,15 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import (
     ListView, DetailView,
     CreateView, UpdateView,
-    DeleteView
+    DeleteView, View
     )
 from django.contrib.auth.mixins import (
     LoginRequiredMixin, UserPassesTestMixin
     )
 from django.contrib.auth.models import User
 from django.db.models import Q
-from blog.models import Post
+from blog.models import Post, PostReaction
 
 
 def about(request):
@@ -115,3 +115,23 @@ class PostSearchView(ListView):
         context['title_query'] = title_query
         context['author_query'] = author_query
         return context
+    
+# Later use TODO
+# class ToggleReactionView(LoginRequiredMixin, View):
+#     def post(self, request, post_id, reaction_type):
+#         post = get_object_or_404(Post, id=post_id)
+#         is_like = reaction_type == "like"
+
+#         reaction, created = PostReaction.objects.get_or_create(user=request.user, post=post)
+
+#         if created:
+#             reaction.is_like = is_like
+#             reaction.save()
+#         else:
+#             if reaction.is_like == is_like:
+#                 reaction.delete()
+#             else:
+#                 reaction.is_like = is_like
+#                 reaction.save()
+
+#         return redirect(post.get_absolute_url())
