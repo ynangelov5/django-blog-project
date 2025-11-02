@@ -32,7 +32,7 @@ class Post(Timestamps):
     def get_absolute_url(self):
         return reverse("post-detail", kwargs={"pk": self.pk})
     
-#TODO consider making an abstract/base reaction model
+#TODO consider making an abstract/base model if more Reaction models are needed
 class PostReaction(Timestamps):
     user = models.ForeignKey(
         to=User,
@@ -79,6 +79,10 @@ class Comment(Timestamps):
 
     def __str__(self):
         return f"Comment by {self.user.username} on {self.post.title}"
+    
+    def get_absolute_url(self):
+        return self.post.get_absolute_url()
+    
 
 
 class CommentReaction(Timestamps):

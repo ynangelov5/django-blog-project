@@ -1,15 +1,18 @@
 from django.shortcuts import get_object_or_404, render, redirect
+from django.urls import reverse
 from django.views.generic import (
     ListView, DetailView,
     CreateView, UpdateView,
     DeleteView, View
     )
+from django.views.generic.edit import FormMixin
 from django.contrib.auth.mixins import (
-    LoginRequiredMixin, UserPassesTestMixin
+    LoginRequiredMixin, UserPassesTestMixin,
     )
 from django.contrib.auth.models import User
 from django.db.models import Q
-from blog.models import Post, PostReaction
+from blog.models import (Post, Comment)
+from blog.forms import CommentForm
 
 
 def about(request):
@@ -35,10 +38,33 @@ class UserPostListView(ListView):
         return Post.objects.filter(author=user).order_by('-created_at')
 
 
-class PostDetailView(DetailView):
+class PostDetailView(FormMixin, DetailView):
     model = Post
     template_name = 'blog/post-detail.html'
     context_object_name = 'post'
+    form_class = CommentForm
+
+    def get_success_url(self):
+        return self.request.path  # redirect back to same post
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = Comment.objects.filter(post=self.object)
+        if 'form' not in context:
+            context['form'] = self.get_form()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = self.object
+            comment.author = request.user  # if using authenticated users
+            comment.save()
+            return redirect(self.get_success_url())
+        else:
+            return self.form_invalid(form)
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -64,7 +90,6 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         post = self.get_object()
         return self.request.user == post.author 
         # raises 403 if a user tries to edit someone else's post
-
 
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -116,22 +141,47 @@ class PostSearchView(ListView):
         context['author_query'] = author_query
         return context
     
-# Later use TODO
-# class ToggleReactionView(LoginRequiredMixin, View):
-#     def post(self, request, post_id, reaction_type):
-#         post = get_object_or_404(Post, id=post_id)
-#         is_like = reaction_type == "like"
 
-#         reaction, created = PostReaction.objects.get_or_create(user=request.user, post=post)
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm  
 
-#         if created:
-#             reaction.is_like = is_like
-#             reaction.save()
-#         else:
-#             if reaction.is_like == is_like:
-#                 reaction.delete()
-#             else:
-#                 reaction.is_like = is_like
-#                 reaction.save()
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.instance.post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        comments = post.comments.all()
+        return render(self.request, 'blog/post-detail.html', {
+            'post': post,
+            'form': form,
+            'comments': comments
+        })
+    
 
-#         return redirect(post.get_absolute_url())
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/comment-update.html'
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.user
+        # raises 403 if a user tries to edit someone else's post
+    
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = 'blog/comment-delete.html'
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.user
+        # raises 403 if a user tries to delete someone else's comment
+    
+    def get_success_url(self):
+        post_id = self.object.post.id
+        return reverse('post-detail', args=[post_id])
+

@@ -1,13 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %} {{ post.title }} {% endblock %}
+{% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
-    {% include "common/post_item.html" %}
+    {% include "common/post-item.html" with post=post %}
+    
     {% if user == post.author %}
     <div class="mt-3">
         <a href="{% url 'post-update' post.id %}" class="btn btn-sm btn-primary">Update</a>
         <a href="{% url 'post-delete' post.id %}" class="btn btn-sm btn-danger">Delete</a>
     </div>
     {% endif %}
+
+    <div class="mt-4">
+        {% include "common/comments-display.html" with post=post %}
+    </div>
 {% endblock %}
